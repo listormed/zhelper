@@ -1,1 +1,77 @@
+project.version: 0.0.1-SNAPSHOT
 
+spring:
+  application.name: ZHelper
+  flyway:
+    locations: classpath:/db/migration
+    validate-on-migrate: true
+    baseline-on-migrate: true
+    user: ${spring_datasource_username}
+    password: ${spring_datasource_password}
+    url: ${spring_datasource_url}
+    table: zhelper_history
+    encoding: UTF-8
+    connect-retries: 2
+    enabled: true
+  datasource:
+    url: ${spring_datasource_url}
+    username: ${spring_datasource_username}
+    password: ${spring_datasource_password}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+    open-in-view: false
+    show-sql: false
+    hibernate.ddl-auto: validate
+  security.user:
+    password: ${spring_security_user_password}
+    name: ${spring_security_user_name}
+  cloud.discovery.enabled: false
+  profiles.active: ${spring_profiles_active}
+
+server:
+  shutdown: "graceful"
+  ssl:
+    enabled: true
+    key-store-type: jks
+    key-store: ${server_ssl_key_store}
+    key-store-password: ${server_ssl_key_store_password}
+    key-alias: ${server_ssl_key_alias}
+    protocol: TLS
+  port: ${server_port}
+  http2.enabled: true
+  servlet:
+    context-path: /zhelper
+    encoding:
+      force: true
+      charset: UTF-8
+  compression.enabled: true
+  tomcat:
+    connection-timeout: 50s
+    resource.allow-caching: false
+
+management:
+  health:
+    livenessState.enabled: true
+    readinessState.enabled: true
+  endpoints.web.exposure.include: health, prometheus
+  endpoint.health:
+    probes.enabled: true
+    show-details: when_authorized
+  endpoints.web.base-path: /metrics
+
+logging:
+  file.name: /var/log/zhelper/zhelper.log
+  pattern.file: "%d{YYYY-MM-dd HH:mm:ss} %-5level %logger{20} - %msg%n"
+
+feign:
+  httpclient:
+    connection-timeout: 5000
+    disable-ssl-validation: false
+  metrics.enabled: true
+
+external:
+  zabbix:
+    url: ${ext_zabbix_url}
+    login: ${ext_zabbix_login}
+    password: ${ext_zabbix_password}
